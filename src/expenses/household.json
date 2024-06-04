@@ -430,6 +430,280 @@
       ],
       "title": "€ spent in groceries per month",
       "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "fdn7gaoli8kjka"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "currencyEUR"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Total spent"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 7,
+        "x": 14,
+        "y": 13
+      },
+      "id": 8,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "vertical",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/.*/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {},
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "dataset": "grafana",
+          "datasource": {
+            "type": "mysql",
+            "uid": "fdn7gaoli8kjka"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "select sum(debit) as \"Total\", subcategory as Restaurante from grafana.transactions where category ='Restauração' group by subcategory order by Total desc limit 1",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Favorite restaurant",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "fdn7gaoli8kjka"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": [],
+          "unit": "currencyEUR"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 9,
+        "x": 0,
+        "y": 18
+      },
+      "id": 6,
+      "options": {
+        "displayLabels": [
+          "name",
+          "value"
+        ],
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": true
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "dataset": "grafana",
+          "datasource": {
+            "type": "mysql",
+            "uid": "fdn7gaoli8kjka"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH monthly_category_sums AS (\n    SELECT \n        category,\n        YEAR(date) AS year,\n        MONTH(date) AS month,\n        SUM(debit) AS total_debit\n    FROM \n        transactions\n    WHERE \n        debit IS NOT NULL and subcategory <> \"Amortização\"\n    GROUP BY \n        category, YEAR(date), MONTH(date)\n)\nSELECT \n    category,\n    AVG(total_debit) AS average_monthly_debit\nFROM \n    monthly_category_sums\nGROUP BY \n    category;\n",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Average € spent per category per month",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "fdn7gaoli8kjka"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": [],
+          "unit": "currencyEUR"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 9,
+        "y": 18
+      },
+      "id": 7,
+      "options": {
+        "displayLabels": [
+          "name",
+          "value"
+        ],
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": true
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "dataset": "grafana",
+          "datasource": {
+            "type": "mysql",
+            "uid": "fdn7gaoli8kjka"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH first_and_last_dates AS (\n    SELECT \n        MIN(date) AS first_date,\n        MAX(date) AS last_date\n    FROM \n        transactions\n    WHERE \n        category = 'Carro'\n), \ntotal_spent_per_subcategory AS (\n    SELECT \n        subcategory,\n        SUM(debit) AS total_spent\n    FROM \n        transactions\n    WHERE \n        category = 'Carro'\n    GROUP BY \n        subcategory\n),\nmonths_between AS (\n    SELECT \n        TIMESTAMPDIFF(MONTH, first_date, last_date) + 1 AS months\n    FROM \n        first_and_last_dates\n)\nSELECT \n    subcategory,\n    total_spent / months AS average_monthly_spent\nFROM \n    total_spent_per_subcategory, months_between;\n",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Average € spent with cars per month",
+      "type": "piechart"
     }
   ],
   "refresh": "",
@@ -447,6 +721,6 @@
   "timezone": "browser",
   "title": "Expenses - Conjunta",
   "uid": "fdn7j5984iupsf",
-  "version": 6,
+  "version": 9,
   "weekStart": ""
 }
