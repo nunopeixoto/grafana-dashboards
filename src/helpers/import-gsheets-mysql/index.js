@@ -39,11 +39,7 @@ const mysqlConfig = {
 async function syncDataToMySQL(data) {
     const connection = await mysql.createConnection(mysqlConfig);
 
-    // Truncate table
-    const truncateTableQuery = `
-    TRUNCATE TABLE transactions;
-    `;
-    await connection.execute(truncateTableQuery);
+
 
     // Create table if not exists
     const createTableQuery = `
@@ -59,6 +55,10 @@ async function syncDataToMySQL(data) {
     )
     `;
     await connection.execute(createTableQuery);
+
+    // Truncate table
+    const truncateTableQuery = `TRUNCATE TABLE transactions;`;
+    await connection.execute(truncateTableQuery);
 
     // Insert data into the table
     const insertQuery = `
