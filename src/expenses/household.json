@@ -232,13 +232,6 @@
           "color": {
             "mode": "thresholds"
           },
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "inspect": false
-          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -252,28 +245,47 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unit": "currencyEUR"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Total spent"
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
-        "h": 7,
-        "w": 4,
+        "h": 4,
+        "w": 7,
         "x": 14,
         "y": 6
       },
-      "id": 1,
+      "id": 8,
       "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": [
-            "sum"
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "vertical",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
           ],
-          "show": false
+          "fields": "/.*/",
+          "values": false
         },
-        "showHeader": false
+        "showPercentChange": false,
+        "text": {},
+        "textMode": "value_and_name",
+        "wideLayout": true
       },
       "pluginVersion": "11.0.0",
       "targets": [
@@ -286,38 +298,29 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "select CONCAT(description, \" - \", \"€\", debit) as alias from grafana.transactions where debit is not null order by debit desc limit 5",
+          "rawSql": "select sum(debit) as \"Total\", subcategory as Restaurante from grafana.transactions where category ='Restauração' group by subcategory order by Total desc limit 1",
           "refId": "A",
           "sql": {
             "columns": [
               {
-                "name": "MAX",
-                "parameters": [
-                  {
-                    "name": "debit",
-                    "type": "functionParameter"
-                  }
-                ],
-                "type": "function"
-              },
-              {
-                "parameters": [
-                  {
-                    "name": "category",
-                    "type": "functionParameter"
-                  }
-                ],
+                "parameters": [],
                 "type": "function"
               }
             ],
-            "groupBy": [],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
             "limit": 50
-          },
-          "table": "transactions"
+          }
         }
       ],
-      "title": "Top 5 expenses of all time",
-      "type": "table"
+      "title": "Favorite restaurant",
+      "type": "stat"
     },
     {
       "datasource": {
@@ -441,6 +444,13 @@
           "color": {
             "mode": "thresholds"
           },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -454,47 +464,28 @@
                 "value": 80
               }
             ]
-          },
-          "unit": "currencyEUR"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Total"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Total spent"
-              }
-            ]
           }
-        ]
+        },
+        "overrides": []
       },
       "gridPos": {
-        "h": 4,
-        "w": 7,
+        "h": 8,
+        "w": 5,
         "x": 14,
-        "y": 13
+        "y": 10
       },
-      "id": 8,
+      "id": 1,
       "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "center",
-        "orientation": "vertical",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
           ],
-          "fields": "/.*/",
-          "values": false
+          "show": false
         },
-        "showPercentChange": false,
-        "text": {},
-        "textMode": "value_and_name",
-        "wideLayout": true
+        "showHeader": false
       },
       "pluginVersion": "11.0.0",
       "targets": [
@@ -507,29 +498,38 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "select sum(debit) as \"Total\", subcategory as Restaurante from grafana.transactions where category ='Restauração' group by subcategory order by Total desc limit 1",
+          "rawSql": "select CONCAT(description, \" - \", \"€\", debit) as alias from grafana.transactions where debit is not null order by debit desc limit 5",
           "refId": "A",
           "sql": {
             "columns": [
               {
-                "parameters": [],
+                "name": "MAX",
+                "parameters": [
+                  {
+                    "name": "debit",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "category",
+                    "type": "functionParameter"
+                  }
+                ],
                 "type": "function"
               }
             ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
+            "groupBy": [],
             "limit": 50
-          }
+          },
+          "table": "transactions"
         }
       ],
-      "title": "Favorite restaurant",
-      "type": "stat"
+      "title": "Top 5 expenses of all time",
+      "type": "table"
     },
     {
       "datasource": {
@@ -721,6 +721,6 @@
   "timezone": "browser",
   "title": "Expenses - Conjunta",
   "uid": "fdn7j5984iupsf",
-  "version": 9,
+  "version": 11,
   "weekStart": ""
 }
