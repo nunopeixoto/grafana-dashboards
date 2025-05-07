@@ -18,13 +18,13 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
+  "id": null,
   "links": [],
   "panels": [
     {
       "datasource": {
         "type": "mysql",
-        "uid": "fdn7gaoli8kjka"
+        "uid": "${DS_MYSQL}"
       },
       "description": "Total spent per month (without mortgage early down-payments)",
       "fieldConfig": {
@@ -105,7 +105,7 @@
           "dataset": "grafana",
           "datasource": {
             "type": "mysql",
-            "uid": "fdn7gaoli8kjka"
+            "uid": "${DS_MYSQL}"
           },
           "editorMode": "code",
           "format": "table",
@@ -137,7 +137,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "fdn7gaoli8kjka"
+        "uid": "${DS_MYSQL}"
       },
       "fieldConfig": {
         "defaults": {
@@ -193,12 +193,12 @@
           "dataset": "grafana",
           "datasource": {
             "type": "mysql",
-            "uid": "fdn7gaoli8kjka"
+            "uid": "${DS_MYSQL}"
           },
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT category, SUM(debit) AS total_debit\nFROM grafana.transactions\nWHERE debit IS NOT NULL\nGROUP BY category\nORDER BY total_debit DESC\nLIMIT 5;\n",
+          "rawSql": "SELECT category, SUM(debit) AS total_debit\nFROM transactions\nWHERE debit IS NOT NULL\nGROUP BY category\nORDER BY total_debit DESC\nLIMIT 5;\n",
           "refId": "A",
           "sql": {
             "columns": [
@@ -225,7 +225,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "fdn7gaoli8kjka"
+        "uid": "${DS_MYSQL}"
       },
       "fieldConfig": {
         "defaults": {
@@ -293,12 +293,12 @@
           "dataset": "grafana",
           "datasource": {
             "type": "mysql",
-            "uid": "fdn7gaoli8kjka"
+            "uid": "${DS_MYSQL}"
           },
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "select sum(debit) as \"Total\", subcategory as Restaurante from grafana.transactions where category ='Restauração' group by subcategory order by Total desc limit 1",
+          "rawSql": "select sum(debit) as \"Total\", subcategory as Restaurante from transactions where category ='Restauração' group by subcategory order by Total desc limit 1",
           "refId": "A",
           "sql": {
             "columns": [
@@ -325,7 +325,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "fdn7gaoli8kjka"
+        "uid": "${DS_MYSQL}"
       },
       "fieldConfig": {
         "defaults": {
@@ -405,7 +405,7 @@
           "dataset": "grafana",
           "datasource": {
             "type": "mysql",
-            "uid": "fdn7gaoli8kjka"
+            "uid": "${DS_MYSQL}"
           },
           "editorMode": "code",
           "format": "table",
@@ -437,7 +437,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "fdn7gaoli8kjka"
+        "uid": "${DS_MYSQL}"
       },
       "fieldConfig": {
         "defaults": {
@@ -493,12 +493,12 @@
           "dataset": "grafana",
           "datasource": {
             "type": "mysql",
-            "uid": "fdn7gaoli8kjka"
+            "uid": "${DS_MYSQL}"
           },
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "select CONCAT(description, \" - \", \"€\", debit) as alias from grafana.transactions where debit is not null order by debit desc limit 5",
+          "rawSql": "select CONCAT(description, \" - \", \"€\", debit) as alias from transactions where debit is not null order by debit desc limit 5",
           "refId": "A",
           "sql": {
             "columns": [
@@ -534,7 +534,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "fdn7gaoli8kjka"
+        "uid": "${DS_MYSQL}"
       },
       "fieldConfig": {
         "defaults": {
@@ -589,7 +589,7 @@
           "dataset": "grafana",
           "datasource": {
             "type": "mysql",
-            "uid": "fdn7gaoli8kjka"
+            "uid": "${DS_MYSQL}"
           },
           "editorMode": "code",
           "format": "table",
@@ -621,7 +621,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "fdn7gaoli8kjka"
+        "uid": "${DS_MYSQL}"
       },
       "fieldConfig": {
         "defaults": {
@@ -676,7 +676,7 @@
           "dataset": "grafana",
           "datasource": {
             "type": "mysql",
-            "uid": "fdn7gaoli8kjka"
+            "uid": "${DS_MYSQL}"
           },
           "editorMode": "code",
           "format": "table",
@@ -720,7 +720,17 @@
   "timepicker": {},
   "timezone": "browser",
   "title": "Expenses - Conjunta",
-  "uid": "fdn7j5984iupsf",
-  "version": 11,
-  "weekStart": ""
+  "uid": null,
+  "version": 1,
+  "weekStart": "",
+  "__inputs": [
+    {
+      "name": "DS_MYSQL",
+      "label": "MySQL Finance Database",
+      "description": "MySQL database containing your financial transactions",
+      "type": "datasource",
+      "pluginId": "mysql",
+      "pluginName": "MySQL"
+    }
+  ]
 }
