@@ -39,8 +39,6 @@ const mysqlConfig = {
 async function syncDataToMySQL(data) {
     const connection = await mysql.createConnection(mysqlConfig);
 
-
-
     // Create table if not exists
     const createTableQuery = `
     CREATE TABLE IF NOT EXISTS transactions (
