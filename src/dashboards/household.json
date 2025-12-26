@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 6,
+  "id": 8,
   "links": [],
   "panels": [
     {
@@ -385,7 +385,7 @@
         "groupWidth": 0.7,
         "legend": {
           "calcs": [],
-          "displayMode": "list",
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": false
         },
@@ -394,11 +394,12 @@
         "stacking": "none",
         "tooltip": {
           "maxHeight": 600,
-          "mode": "single",
+          "mode": "multi",
           "sort": "none"
         },
+        "xField": "month_year",
         "xTickLabelRotation": 0,
-        "xTickLabelSpacing": 0
+        "xTickLabelSpacing": 100
       },
       "targets": [
         {
@@ -410,7 +411,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "WITH monthly_sums AS (\n    SELECT \n        YEAR(date) AS year,\n        MONTHNAME(date) AS month,\n        SUM(debit) AS total_debit\n    FROM \n        transactions\n    WHERE \n        debit IS NOT NULL and subcategory <> \"Amortização\"\n    GROUP BY \n        YEAR(date), MONTH(date)\n)\nSELECT \n    month,\n    AVG(total_debit) AS average_monthly_debit\nFROM \n    monthly_sums\nGROUP BY \n    month\nORDER BY \n    FIELD(month, 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');\n",
+          "rawSql": "SELECT \n    DATE_FORMAT(date, '%b %Y') AS month_year,\n    SUM(debit) AS total_debit\nFROM \n    transactions\nWHERE \n    $__timeFilter(date)\n    AND debit IS NOT NULL\n    AND category <> \"Férias\"\n    AND subcategory <> \"Amortização\"\nGROUP BY \n    YEAR(date), MONTH(date)\nORDER BY \n    YEAR(date), MONTH(date);",
           "refId": "A",
           "sql": {
             "columns": [
@@ -431,7 +432,7 @@
           }
         }
       ],
-      "title": "€ spent per month",
+      "title": "€ spent per month (excl. vacations)",
       "type": "barchart"
     },
     {
@@ -469,7 +470,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 11,
         "w": 5,
         "x": 14,
         "y": 10
@@ -498,7 +499,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "select CONCAT(description, \" - \", \"€\", debit) as alias from transactions where debit is not null order by debit desc limit 5",
+          "rawSql": "select CONCAT(description, \" - \", \"€\", debit) as alias from transactions where debit is not null order by debit desc limit 10",
           "refId": "A",
           "sql": {
             "columns": [
@@ -528,7 +529,7 @@
           "table": "transactions"
         }
       ],
-      "title": "Top 5 expenses of all time",
+      "title": "Top 10 expenses of all time",
       "type": "table"
     },
     {
@@ -603,11 +604,11 @@
         "stacking": "none",
         "tooltip": {
           "maxHeight": 600,
-          "mode": "single",
+          "mode": "multi",
           "sort": "none"
         },
         "xTickLabelRotation": 0,
-        "xTickLabelSpacing": 0
+        "xTickLabelSpacing": 100
       },
       "targets": [
         {
@@ -619,7 +620,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "WITH monthly_sums AS (\n    SELECT \n        YEAR(date) AS year,\n        MONTHNAME(date) AS month,\n        SUM(debit) AS total_debit\n    FROM \n        transactions\n    WHERE \n        debit IS NOT NULL AND category = 'groceries'\n    GROUP BY \n        YEAR(date), MONTH(date)\n)\nSELECT \n    month,\n    AVG(total_debit) AS average_monthly_debit\nFROM \n    monthly_sums\nGROUP BY \n    month\nORDER BY \n    FIELD(month, 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');\n",
+          "rawSql": "SELECT \n    DATE_FORMAT(date, '%b %Y') AS month_year,\n    SUM(debit) AS total_debit\nFROM \n    transactions\nWHERE \n    $__timeFilter(date)\n    AND debit IS NOT NULL \n    AND category = 'groceries'\nGROUP BY \n    YEAR(date), MONTH(date)\nORDER BY \n    YEAR(date), MONTH(date);",
           "refId": "A",
           "sql": {
             "columns": [
@@ -825,15 +826,28 @@
     "list": []
   },
   "time": {
-    "from": "now-6h",
+    "from": "2022-08-01",
     "to": "now"
   },
   "timeRangeUpdatedDuringEditOrView": false,
-  "timepicker": {},
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
   "timezone": "browser",
   "title": "Expenses - Conjunta",
   "uid": null,
-  "version": 5,
+  "version": 9,
   "weekStart": "",
   "__inputs": [
     {
@@ -844,5 +858,5 @@
       "pluginId": "mysql",
       "pluginName": "MySQL"
     }
-  ]
+  ]  
 }
