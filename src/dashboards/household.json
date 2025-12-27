@@ -707,7 +707,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "WITH monthly_category_sums AS (\n    SELECT \n        category,\n        YEAR(date) AS year,\n        MONTH(date) AS month,\n        SUM(debit) AS total_debit\n    FROM \n        transactions\n    WHERE \n        debit IS NOT NULL and subcategory <> \"Amortização\"\n    GROUP BY \n        category, YEAR(date), MONTH(date)\n)\nSELECT \n    category,\n    AVG(total_debit) AS average_monthly_debit\nFROM \n    monthly_category_sums\nGROUP BY \n    category;\n",
+          "rawSql": "WITH monthly_category_sums AS (\n    SELECT \n        category,\n        YEAR(date) AS year,\n        MONTH(date) AS month,\n        SUM(debit) AS total_debit\n    FROM \n        transactions\n    WHERE \n        $__timeFilter(date)\n        AND debit IS NOT NULL\n        AND category <> \"Férias\"\n        AND subcategory <> \"Amortização\"\n    GROUP BY \n        category, YEAR(date), MONTH(date)\n)\nSELECT \n    category,\n    AVG(total_debit) AS value\nFROM \n    monthly_category_sums\nGROUP BY \n    category\nORDER BY \n    value DESC;",
           "refId": "A",
           "sql": {
             "columns": [
@@ -728,7 +728,7 @@
           }
         }
       ],
-      "title": "Average € spent per category per month",
+      "title": "Average € spent per category per month (excl. vacations)",
       "type": "piechart"
     },
     {
@@ -742,13 +742,51 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
             }
           },
           "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
           "unit": "currencyEUR"
         },
         "overrides": []
@@ -761,22 +799,11 @@
       },
       "id": 7,
       "options": {
-        "displayLabels": [
-          "name",
-          "value"
-        ],
         "legend": {
+          "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
           "showLegend": false
-        },
-        "pieType": "pie",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": true
         },
         "tooltip": {
           "maxHeight": 600,
@@ -794,7 +821,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "WITH first_and_last_dates AS (\n    SELECT \n        MIN(date) AS first_date,\n        MAX(date) AS last_date\n    FROM \n        transactions\n    WHERE \n        category = 'Carro'\n), \ntotal_spent_per_subcategory AS (\n    SELECT \n        subcategory,\n        SUM(debit) AS total_spent\n    FROM \n        transactions\n    WHERE \n        category = 'Carro'\n    GROUP BY \n        subcategory\n),\nmonths_between AS (\n    SELECT \n        TIMESTAMPDIFF(MONTH, first_date, last_date) + 1 AS months\n    FROM \n        first_and_last_dates\n)\nSELECT \n    subcategory,\n    total_spent / months AS average_monthly_spent\nFROM \n    total_spent_per_subcategory, months_between;\n",
+          "rawSql": "WITH RECURSIVE date_range AS (\n    SELECT \n        DATE_FORMAT(\n            DATE_ADD(\n                DATE_FORMAT($__timeFrom(), '%Y-%m-01'),\n                INTERVAL 0 MONTH\n            ),\n            '%Y-%m-01'\n        ) AS month_date\n    UNION ALL\n    SELECT \n        DATE_ADD(month_date, INTERVAL 1 MONTH)\n    FROM \n        date_range\n    WHERE \n        month_date < DATE_FORMAT($__timeTo(), '%Y-%m-01')\n),\nmonthly_spending AS (\n    SELECT \n        DATE_FORMAT(date, '%Y-%m-01') AS month_date,\n        SUM(debit) AS total_spent\n    FROM \n        transactions\n    WHERE \n        $__timeFilter(date)\n        AND category = 'Carro'\n        AND debit IS NOT NULL\n    GROUP BY \n        DATE_FORMAT(date, '%Y-%m-01')\n)\nSELECT \n    UNIX_TIMESTAMP(dr.month_date) AS time_sec,\n    COALESCE(ms.total_spent, 0) AS total_spent\nFROM \n    date_range dr\nLEFT JOIN \n    monthly_spending ms ON dr.month_date = ms.month_date\nORDER BY \n    dr.month_date;",
           "refId": "A",
           "sql": {
             "columns": [
@@ -816,7 +843,7 @@
         }
       ],
       "title": "Average € spent with cars per month",
-      "type": "piechart"
+      "type": "timeseries"
     }
   ],
   "refresh": "",
@@ -845,7 +872,7 @@
     ]
   },
   "timezone": "browser",
-  "title": "Expenses - Conjunta",
+  "title": "Expenses - Conta Conjunta",
   "uid": null,
   "version": 9,
   "weekStart": "",
@@ -858,5 +885,5 @@
       "pluginId": "mysql",
       "pluginName": "MySQL"
     }
-  ]  
+  ]
 }
