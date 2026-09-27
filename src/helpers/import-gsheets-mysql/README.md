@@ -1,4 +1,4 @@
-# import-gsheets-mysl
+# import-gsheets-mysql
 
 
 ## Purpose
