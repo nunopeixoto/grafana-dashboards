@@ -63,7 +63,15 @@ async function syncDataToMySQL(data) {
     INSERT INTO transactions (date, description, debit, credit, category, subcategory, note)
     VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
-    const insertData = data.map((row, index) => {
+    // The sheet is manually filled, so stop at the first fully empty row
+    const emptyRowIndex = data.findIndex((row) => !row || row.every((cell) => !String(cell ?? '').trim()));
+    const rows = emptyRowIndex === -1 ? data : data.slice(0, emptyRowIndex);
+    if (emptyRowIndex !== -1) {
+        console.log(`Empty row found at sheet row ${emptyRowIndex + 2}, stopping there`);
+    }
+    console.log(`Last expense date: ${rows[rows.length - 1]?.[0]}`);
+
+    const insertData = rows.map((row, index) => {
         try {
             return [
                 row[0] ? new Date(row[0]) : null,   // date
@@ -85,6 +93,10 @@ async function syncDataToMySQL(data) {
     for (const rowData of insertData) {
         await connection.execute(insertQuery, rowData);
     }
+    console.log(`Inserted ${insertData.length} rows (${data.length} fetched from the sheet)`);
+
+    const [[{ total }]] = await connection.query('SELECT COUNT(*) AS total FROM transactions');
+    console.log(`Total transactions in db: ${total}`);
 
     await connection.end();
 }
