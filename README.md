@@ -14,7 +14,7 @@
 
 ### Manual
 - The Grafana dashboards connect to a MariaDB instance
-- The DB should contain the table that looks like this:
+- The DB should contain one table per expense sheet (`transactions` for the household, `personal_expenses` for the personal one), each looking like this:
 ```sql
 CREATE TABLE IF NOT EXISTS transactions (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -27,3 +27,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     note TEXT
 );
 ```
+
+## Dashboards
+- `src/dashboards/household.json` - shared household expenses, reads the `transactions` table
+- `src/dashboards/personal.json` - personal expenses (hobbies and other personal spending), reads the `personal_expenses` table
