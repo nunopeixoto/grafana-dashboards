@@ -63,16 +63,23 @@ async function syncDataToMySQL(data) {
     INSERT INTO transactions (date, description, debit, credit, category, subcategory, note)
     VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
-    const insertData = data.map((row) => {
-        return [
-            row[0] ? new Date(row[0]) : null,   // date
-            row[1] || null,                     // description
-            parseFloat(row[2].replace(',', '.')) || null,  // debit
-            parseFloat(row[3].replace(',', '.')) || null,  // credit
-            row[4] || null,                     // category
-            row[5] || null,                     // subcategory
-            row[6] || null                      // note
-        ];
+    const insertData = data.map((row, index) => {
+        try {
+            return [
+                row[0] ? new Date(row[0]) : null,   // date
+                row[1] || null,                     // description
+                parseFloat(row[2].replace(',', '.')) || null,  // debit
+                parseFloat(row[3].replace(',', '.')) || null,  // credit
+                row[4] || null,                     // category
+                row[5] || null,                     // subcategory
+                row[6] || null                      // note
+            ];
+        } catch (error) {
+            // +2: sheet rows are 1-based and the header row is excluded from the range
+            console.error(`Row ${index + 2} is invalid: ${error.message}`);
+            console.error('  content:', JSON.stringify(row));
+            throw error;
+        }
     });
 
     for (const rowData of insertData) {
